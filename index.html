@@ -143,12 +143,8 @@
 <div class="card">
 <div class="section-title">🎭 选择音色</div>
 <div class="voice-toolbar">
-<div style="display:flex;gap:8px;margin-bottom:10px;width:100%">
-<button class="btn btn-sm" id="libraryBtn" onclick="switchVoiceSource('library')" style="background:rgba(102,126,234,0.2);color:#8b9bf3">📚 库</button>
-<button class="btn btn-sm" id="collectedBtn" onclick="switchVoiceSource('collected')" style="background:transparent">⭐ 收藏</button>
-</div>
 <select class="filter-select" id="genderFilter" onchange="filterVoices()"><option value="">全部性别</option><option value="男">男声</option><option value="女">女声</option><option value="未知">其他</option></select>
-<select class="filter-select" id="sourceFilter" onchange="filterVoices()" style="display:none"><option value="">全部来源</option><option value="库">库</option><option value="收藏">收藏</option></select>
+<select class="filter-select" id="sourceFilter" onchange="filterVoices()"><option value="">全部来源</option><option value="系统">系统音色</option><option value="克隆">克隆音色</option><option value="生成">生成音色</option></select>
 <input type="text" class="search-input" id="searchInput" placeholder="搜索音色名称..." oninput="filterVoices()">
 </div>
 <div class="voice-grid" id="voiceGrid">
@@ -168,7 +164,6 @@ let selectedVoice = null;
 let currentAudio = null;
 let isPlaying = false;
 let generatedAudio = null;
-let currentVoiceSource = 'library';
 
 document.addEventListener("DOMContentLoaded", () => {
     checkApiKey();
@@ -195,13 +190,6 @@ function saveApiKey() {
     }
 }
 
-function switchVoiceSource(source) {
-    currentVoiceSource = source;
-    document.getElementById('libraryBtn').style.cssText = source === 'library' ? 'background:rgba(102,126,234,0.2);color:#8b9bf3' : 'background:transparent';
-    document.getElementById('collectedBtn').style.cssText = source === 'collected' ? 'background:rgba(102,126,234,0.2);color:#8b9bf3' : 'background:transparent';
-    loadVoices();
-}
-
 async function loadVoices() {
     const apiKey = localStorage.getItem("minimax_api_key");
     if (!apiKey) return;
@@ -210,7 +198,7 @@ async function loadVoices() {
     grid.innerHTML = '<div class="loading-voices">正在加载音色库...</div>';
     
     try {
-        const res = await fetch(`/api/voices?api_key=${encodeURIComponent(apiKey)}&source=${currentVoiceSource}`);
+        const res = await fetch(`/api/voices?api_key=${encodeURIComponent(apiKey)}`);
         const data = await res.json();
         
         if (data.success && data.voices) {
